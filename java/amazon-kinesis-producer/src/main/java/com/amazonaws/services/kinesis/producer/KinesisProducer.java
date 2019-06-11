@@ -243,7 +243,7 @@ public class KinesisProducer implements IKinesisProducer {
         this.config = config;
         
         String caDirectory = extractBinaries();
-        
+
         env = new ImmutableMap.Builder<String, String>()
                 .put("LD_LIBRARY_PATH", pathToLibDir)
                 .put("DYLD_LIBRARY_PATH", pathToLibDir)
@@ -286,7 +286,27 @@ public class KinesisProducer implements IKinesisProducer {
         this.env = null;
         child = new Daemon(inPipe, outPipe, new MessageHandler());
     }
-    
+
+    protected KinesisProducer(KinesisProducerConfiguration config, File inPipe, File outPipe) {
+        this.config = config;
+        this.env = null;
+
+        String root = "amazon-kinesis-producer-native-binaries";
+        String tmpDir = config.getTempDirectory();
+        if (tmpDir.trim().length() == 0) {
+            tmpDir = System.getProperty("java.io.tmpdir");
+        }
+        tmpDir = Paths.get(tmpDir, root).toString();
+        pathToTmpDir = tmpDir;
+
+        String binPath = config.getNativeExecutable();
+        if (binPath != null && !binPath.trim().isEmpty()) {
+            pathToExecutable = binPath.trim();
+        }
+
+        child = new Daemon(inPipe, outPipe, pathToExecutable, new MessageHandler(), pathToTmpDir, config);
+    }
+
     /**
      * Put a record asynchronously. A {@link ListenableFuture} is returned that
      * can be used to retrieve the result, either by polling or by registering a

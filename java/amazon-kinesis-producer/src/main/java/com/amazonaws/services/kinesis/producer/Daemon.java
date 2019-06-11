@@ -165,7 +165,28 @@ public class Daemon {
             fatalError("Could not connect to child", e, false);
         }
     }
-    
+
+    protected Daemon(File inPipe, File outPipe, String pathToExecutable, MessageHandler handler, String workingDir,
+                     KinesisProducerConfiguration config) {
+        this.inPipe = inPipe;
+        this.outPipe = outPipe;
+        this.pathToExecutable = pathToExecutable;
+        this.handler = handler;
+        this.workingDir = workingDir;
+        this.config = config;
+        this.environmentVariables = null;
+
+        lenBuf.order(ByteOrder.BIG_ENDIAN);
+        rcvBuf.order(ByteOrder.BIG_ENDIAN);
+
+        try {
+            connectToChild();
+            startLoops();
+        } catch (IOException e) {
+            fatalError("Could not connect to child", e, false);
+        }
+    }
+
     /**
      * Enqueue a message to be sent to the child process.
      * 
