@@ -59,7 +59,6 @@
     <properties>
         <aws-sdk-core-version>1.11.312</aws-sdk-core-version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -152,4 +151,11 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <url>https://repo.nos.to/content/repositories/NostoDependencies/</url>
+        </repository>
+    </distributionManagement>
 </project>
